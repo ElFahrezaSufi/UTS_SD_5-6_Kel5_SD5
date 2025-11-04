@@ -37,4 +37,25 @@ int main() {
     return 0;
 }
 
-// Penjelasan
+// Penjelasan Algoritma:
+// Program ini mensimulasikan sistem antrian rumah sakit dengan dua jenis antrian:
+// Antrian normal → pasien biasa.
+// Antrian darurat → pasien dengan kondisi darurat (prioritas lebih tinggi).
+
+// Program ini menggunakan Queue dengan prinsip FIFO (First In, First Out):
+// Elemen pertama yang masuk akan dilayani lebih dulu.
+
+// Langkah-langkah:
+// 1. Masukkan jumlah perintah yang akan dimasukkan
+
+// 2. Perintah = "DATANG"
+//      Artinya ada pasien normal datang, maka nama pasien dimasukkan ke antrian normal.
+// 3. Perintah = "DARURAT"
+//      Artinya ada pasien darurat datang, maka nama pasien dimasukkan ke antrian darurat.
+
+// 4. Perintah = "LAYANI"
+//      Artinya dokter melayani pasien berikutnya, dengan aturan:
+//      Jika ada pasien darurat, layani dari darurat dulu.
+//      Jika tidak ada pasien darurat, baru layani dari normal.
+
+// Input dan Output sudah sesuai dengan Format dari soal.
