@@ -5,59 +5,68 @@
 
 using namespace std;
 
-class Graph {
+class Graf {
 private:
-    int numberVertex;
-    vector<vector<int>> adjMatrix; 
+    int jumlahTitik;                      // Menyimpan jumlah vertex (titik) dalam graf
+    vector<vector<int>> matriksKeterhubungan; // Menyimpan hubungan antar titik dalam bentuk matriks
 
 public:
-    Graph(int banyakTititk) {
-        numberVertex = banyakTititk;
-        adjMatrix.resize(banyakTititk, vector<int>(numberVertex, 0));
+    // Konstruktor untuk membuat graf dengan jumlah titik tertentu
+    Graf(int banyakTitik) {
+        jumlahTitik = banyakTitik;
+        matriksKeterhubungan.resize(banyakTitik, vector<int>(jumlahTitik, 0));
     }
 
-    void addEdge(int i, int j) {
-        if (i >= 0 && i < numberVertex && j >= 0 && j < numberVertex) {
-            adjMatrix[i][j] = 1; 
-            adjMatrix[j][i] = 1; 
+    // Fungsi untuk menambahkan hubungan (edge) antara dua titik
+    void tambahHubungan(int i, int j) {
+        if (i >= 0 && i < jumlahTitik && j >= 0 && j < jumlahTitik) {
+            matriksKeterhubungan[i][j] = 1; // Hubungan dari i ke j
+            matriksKeterhubungan[j][i] = 1; // Karena graf tidak berarah, tambahkan juga dari j ke i
         }
     }
 
-    void solveVirusSpread(int startVertex, int K) {
-        vector<int> distance(numberVertex, -1); 
-        queue<int> titikVisit; 
+    // Fungsi utama untuk menghitung penyebaran virus pada hari ke-K
+    void hitungPenyebaranVirus(int titikAwal, int hariK) {
+        vector<int> jarak(jumlahTitik, -1);  // Menyimpan "hari terinfeksi" tiap titik (-1 artinya belum terinfeksi)
+        queue<int> antrianTitik;             // Antrian BFS untuk simulasi penyebaran virus
 
-        distance[startVertex] = 0;
-        titikVisit.push(startVertex);
+        // Titik awal langsung diset sebagai terinfeksi di hari ke-0
+        jarak[titikAwal] = 0;
+        antrianTitik.push(titikAwal);
 
-        while (!titikVisit.empty()) {
-            int currentVertex = titikVisit.front();
-            titikVisit.pop();
+        // Proses BFS — mensimulasikan penyebaran virus dari titik ke titik tetangga
+        while (!antrianTitik.empty()) {
+            int titikSekarang = antrianTitik.front();
+            antrianTitik.pop();
 
-            for (int i = 0; i < numberVertex; i++) {
-                if (adjMatrix[currentVertex][i] == 1 && distance[i] == -1) {
-                    
-                    distance[i] = distance[currentVertex] + 1;
-                    titikVisit.push(i);
+            // Mengecek semua tetangga dari titikSekarang
+            for (int i = 0; i < jumlahTitik; i++) {
+                // Jika ada hubungan dan titik i belum terinfeksi
+                if (matriksKeterhubungan[titikSekarang][i] == 1 && jarak[i] == -1) {
+                    jarak[i] = jarak[titikSekarang] + 1; // Hari infeksi dihitung dari induknya + 1
+                    antrianTitik.push(i);                // Masukkan ke antrian untuk disebarkan selanjutnya
                 }
             }
         }
-        
-        vector<int> infected_on_K;
-        for (int i = 0; i < numberVertex; i++) {
-            if (distance[i] == K) {
-                infected_on_K.push_back(i);
+
+        // Menyimpan titik-titik yang terinfeksi tepat pada hari ke-K
+        vector<int> terinfeksiHariK;
+        for (int i = 0; i < jumlahTitik; i++) {
+            if (jarak[i] == hariK) {
+                terinfeksiHariK.push_back(i);
             }
         }
 
-        sort(infected_on_K.begin(), infected_on_K.end());
-        
-        cout << "Node terinfeksi: ";
-        if (infected_on_K.empty()) {
+        // Mengurutkan hasil agar tampil rapi
+        sort(terinfeksiHariK.begin(), terinfeksiHariK.end());
+
+        // Menampilkan hasil penyebaran
+        cout << "Titik yang terinfeksi pada hari ke-" << hariK << ": ";
+        if (terinfeksiHariK.empty()) {
             cout << "(TIDAK ADA)" << endl;
         } else {
-            for (int node : infected_on_K) {
-                cout << node << " ";
+            for (int titik : terinfeksiHariK) {
+                cout << titik << " ";
             }
             cout << endl;
         }
@@ -65,56 +74,64 @@ public:
 };
 
 int main() {
-    int V, E; 
+    int V, E; // V = jumlah vertex, E = jumlah edge
     
-    cout << "Masukkan jumlah vertex dan edge: ";
+    cout << "Masukkan jumlah Vertex dan edge: ";
     if (!(cin >> V >> E)) return 0;
     
-    Graph graph(V);
+    Graf graf(V);
     int u, v;
     
-    cout << "Masukkan " << E << " hubungan pertemanan (u v):\n";
+    cout << "Masukkan " << E << " pasangan hubungan pertemanan (u v):\n";
     for (int i = 0; i < E; ++i) {
         if (!(cin >> u >> v)) return 0;
-        graph.addEdge(u, v);
+        graf.tambahHubungan(u, v);
     }
     
-    int startNode, K; 
-    char choice;
+    int titikAwal, hariK; 
+    char pilihan;
     
     cout << "\n========================================\n";
-    cout << "Graf berhasil dibuat. Mulai pengujian S & K.\n";
+    cout << "Graf berhasil dibuat. Mulai simulasi penyebaran virus.\n";
     
     do {
-        cout << "\nMasukkan Node Awal (S) dan Hari Terinfeksi (K): ";
-        if (!(cin >> startNode >> K)) break;
+        // Input node awal dan hari ke-K yang ingin disimulasikan
+        cout << "\nNode awal dan hari terinfeksi: ";
+        if (!(cin >> titikAwal >> hariK)) break;
 
-        graph.solveVirusSpread(startNode, K);
+        graf.hitungPenyebaranVirus(titikAwal, hariK);
         
-        cout << "Ulangi pengujian? (y/t): ";
-        cin >> choice;
+        // Pilihan untuk mengulang simulasi
+        cout << "Ingin menguji lagi? (y/t): ";
+        cin >> pilihan;
         
-    } while (choice == 'y' || choice == 'Y');
+    } while (pilihan == 'y' || pilihan == 'Y');
     
     cout << "Program selesai. Terima kasih.\n";
     
     return 0;
 }
 
-// Penjelasan Algoritma/Logika Penyelesaian
+/* PENJELASAN LOGIKA PROGRAM 
 
-/*
-* Logika Penyelesaian Soal Nomor 3 (Penyebaran Virus pada Hari ke-K)
-* 1. Representasi Graf:
-Saya menggunakan Matriks Ketetanggaan (adjMatrix) untuk menyimpan hubungan pertemanan, yang diimplementasikan di dalam kelas Graph. Graf ini tak berarah.
-* 2. Pemilihan Algoritma:
-Sesuai instruksi soal, saya menggunakan **Breadth-First Search (BFS)**. BFS sangat tepat karena mampu mensimulasikan penyebaran virus "hari demi hari" atau "level demi level" (menghitung jarak terpendek/shortest path), yang setara dengan Hari ke-K terinfeksi.
-* 3. Implementasi Jarak (Hari Infeksi):
-- Saya menggunakan vektor `distance` untuk melacak hari terinfeksi setiap orang; nilai `-1` berarti belum terinfeksi.
-- Node awal (`startVertex`) diset sebagai Hari ke-0.
-- Saat BFS: Jika node `v` adalah tetangga node `u` yang belum terinfeksi, `distance[v]` dihitung sebagai `distance[u] + 1`. Ini adalah kunci untuk menentukan hari terinfeksi tercepat.
-* 4. Pengumpulan dan Output Hasil:
-- Setelah BFS, saya mencari semua node `i` yang memiliki `distance[i]` TEPAT sama dengan Hari yang ditanyakan (`K`).
-- Hasilnya diurutkan secara menaik menggunakan `std::sort`.
-- Jika tidak ada yang terinfeksi pada Hari ke-K, saya mencetak "(TIDAK ADA)".
+1  Representasi Graf:
+   - Saya menggunakan **Matriks Keterhubungan (Adjacency Matrix)** untuk menyimpan siapa terhubung dengan siapa.
+   - Matriks ini bersifat **simetris** karena hubungan pertemanan tidak berarah (A teman B berarti B juga teman A).
+
+2️  Algoritma yang Dipakai:
+   - Menggunakan **Breadth-First Search (BFS)**.
+   - BFS cocok untuk menyimulasikan penyebaran virus karena berjalan "lapis demi lapis" — 
+     persis seperti penyebaran harian dari satu titik ke tetangga terdekat.
+
+3️  Mekanisme Perhitungan:
+   - Vektor `jarak` menyimpan kapan (hari ke berapa) setiap titik terinfeksi.
+   - `-1` berarti titik itu belum terinfeksi.
+   - BFS dimulai dari `titikAwal` dengan jarak 0.
+   - Setiap kali BFS berpindah ke tetangga, nilai `jarak` diisi `jarak[parent] + 1`.
+
+4️  Output Akhir:
+   - Setelah BFS selesai, semua titik yang `jarak[i] == hariK` dikumpulkan.
+   - Jika tidak ada titik dengan jarak itu, berarti tidak ada yang terinfeksi di hari tersebut.
+   - Hasil ditampilkan dalam urutan menaik.
+
 */
