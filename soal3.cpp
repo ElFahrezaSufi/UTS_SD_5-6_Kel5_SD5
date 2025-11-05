@@ -23,9 +23,7 @@ public:
         }
     }
 
-    // Fungsi BFS yang dimodifikasi untuk mencari node yang terinfeksi Hari ke-K
     void solveVirusSpread(int startVertex, int K) {
-        // ... (Kode BFS Anda tetap sama di sini) ...
         vector<int> distance(numberVertex, -1); 
         queue<int> titikVisit; 
 
