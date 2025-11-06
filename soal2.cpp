@@ -30,12 +30,16 @@ int main() {
             else if (!normal.empty()) {
                 cout << normal.front() << endl;
                 normal.pop();
+            } 
+            else {
+                cout << "TIDAK ADA PASIEN" << endl;
             }
         }
     }
 
     return 0;
 }
+
 
 // Penjelasan Algoritma:
 // Program ini mensimulasikan sistem antrian rumah sakit dengan dua jenis antrian:
